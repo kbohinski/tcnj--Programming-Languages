@@ -1,4 +1,16 @@
-﻿using System;
+﻿/*
+ * David Vassallo & Kevin Bohinski
+ * 9/19/16
+ * CSC 435 Programming Languages
+ *
+ * Project 1
+ * Print all years between 2000 -> 2100 that do not have any month with 5 weekends.
+ *
+ * 5WeekendCalculator.cs
+ */
+
+// Imports for collections and calendar
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,15 +21,17 @@ using System.Globalization;
 namespace _5WeekendCalculator {
     class Program {
         static void Main(string[] args) {
-            DateTime CurrentDate = new DateTime(2000, 1, 1); 
-            ArrayList InvalidYears = new ArrayList(); 
+	    // Start at 2000 as per spec.
+            DateTime CurrentDate = new DateTime(2000, 1, 1);
+
+	    // Create two collections for saving the years.
+            ArrayList InvalidYears = new ArrayList();
             ArrayList ValidYears = new ArrayList();
 
-            //While loop that goes through each month with 31 days
-
-            while (CurrentDate.Year < 2101) { 
-                if (CurrentDate.DayOfWeek == DayOfWeek.Friday) { 
-                    InvalidYears.Add(CurrentDate.Year); //
+            // While loop that goes through each month with 31 days.
+            while (CurrentDate.Year < 2101) {
+                if (CurrentDate.DayOfWeek == DayOfWeek.Friday) {
+                    InvalidYears.Add(CurrentDate.Year);
                     CurrentDate = NextYear(CurrentDate);
                 }
                 else {
@@ -25,19 +39,14 @@ namespace _5WeekendCalculator {
                 }
             }
 
-            //Goes through all years and adds all valid years to an ArrayList
-
+            // Goes through all years and adds all valid years to an ArrayList.
             for (int counter = 2000; counter <= 2100; counter++) {
-                if (InvalidYears.Contains(counter)) {
-                    continue;
-                }
-                else {
+                if (!InvalidYears.Contains(counter)) {
                     ValidYears.Add(counter);
                 }
             }
 
-            //Outputs all years in the ValidYears ArrayList
-
+            // Outputs all years in the ValidYears ArrayList.
             foreach (int Year in ValidYears) {
                 Console.Out.WriteLine(Year);
             }
@@ -46,8 +55,7 @@ namespace _5WeekendCalculator {
         /*
          * Jumps to next year
          * <param name = input>DateTime object to be incremented by year</param>
-         */ 
-
+         */
         static DateTime NextYear(DateTime input) {
             if (input.Month == 1) input = input.AddMonths(12);
             else if (input.Month == 3) input = input.AddMonths(10);
@@ -63,7 +71,6 @@ namespace _5WeekendCalculator {
          * Jumps to next month containing 31 days
          * <param name = input>DateTime object that will jump to next month with 31 days</param>
          */
-
         static DateTime NextMonth(DateTime input) {
             if (input.Month == 1) input = input.AddMonths(2);
             else if (input.Month == 3) input = input.AddMonths(2);
