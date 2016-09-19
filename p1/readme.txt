@@ -28,21 +28,22 @@ README File
       ruby weekend_calculator.rb
 
   Conventions:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    We attempted to follow the conventions found in the respective language documentation.
 
   Input/Output:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    None of our applications require input.
+    All of our applications print to stdout.
 
   Limitations & Bugs:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    There are no bugs or limitations that we know of.
 
   Completed Functionality:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    These programs are completed and functional as per the spec.
 
   Justification of Abstractions, Data Structures, Algorithms, and Design Decisions:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    Our applications use the languages standard calendaring libraries to iterate through the months with 31 days from 2000 to 2100. If the first day is a Friday or the last day is a Sunday, that month has five weekends. At this point the year is ignored as it has five weekends. With the use of this iteration we are able to print to stdout the years that do not have five weekends. The Data Structures used are arrays or dynamic arrays depending on the language, some solutions forgo this is and make use of breaks in the loops.
 
   Comparison of Languages:
-    -Easy/Hard
-    -Speed Diff
-    -Likes/Dislikes
+    We found C# to be easy for us to pick up as it is similar to Java. We found Ruby to be more difficult as it had unfamiliar syntax. Clojure was the most difficult as we were unfamiliar with the functional paradigm. Ada was fairly simple, due to a website that compared its syntax to C.
+    Clojure was the slowest, due to the time required to spawn the JVM. Between the other languages there was no noticeable speed difference as this was a fairly small assignment. Differences would be more pronounced in larger code bases. Theoretically the compiled languages should be faster than the interpreted languages, and the statically typed languages should be faster than dynamic typed languages.
+    Aside from syntax the experiences were enjoyable with the exception of Clojure. It was frustrating to adapt to Clojure's paradigms.
