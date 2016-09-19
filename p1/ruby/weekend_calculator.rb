@@ -1,3 +1,13 @@
+# David Vassallo & Kevin Bohinski
+# 9/19/16
+# CSC 435 Programming Languages
+
+# Project 1
+# Print all years between 2000 -> 2100 that do not have any month with 5 weekends.
+
+# weekend_calculator.rb
+
+# Import ruby's calendar
 require 'date'
 
 class Weekend_Calculator
