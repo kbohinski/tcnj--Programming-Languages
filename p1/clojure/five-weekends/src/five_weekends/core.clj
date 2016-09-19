@@ -1,3 +1,13 @@
+;; Kevin Bohinski & David Vassallo
+;; 9/19/16
+;; CSC 435 Programming Languages
+
+;; Project 1
+;; Print all years between 2000 -> 2100 that do not have any month with 5 weekends.
+
+;; core.clj
+
+;; Uses namespacing for lein.
 (ns five-weekends.core
   (:gen-class))
 
