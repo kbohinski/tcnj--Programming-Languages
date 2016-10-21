@@ -32,6 +32,8 @@ README File
 
   Input/Output:
     Our application requires input.
+        A sample input file can be found at input.txt.
+	Please refer to the format of this file.
 	Please use file redirection for simplicity when running our program.  An example is below:
 	.\a.exe < input.txt
     Our application prints to stdout & stderr.
