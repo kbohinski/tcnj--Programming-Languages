@@ -36,6 +36,13 @@ bool get_first_set(int key, int active_key, map<int, vector<vector<int>>> &prod,
 void get_follow_set(map<int, vector<vector<int>>> &prod, map<int, set<int>> &follow,
                     map<int, set<int>> &first);
 
+void get_parse_table(int x_size, int y_size, vector<vector<int>> &parse_table, map<int, vector<vector<int>>> prod,
+                     map<int, set<int>> follow, map<int, set<int>> first);
+
+int run(map<int, vector<vector<int>>> prod, map<string, int> non_terminal_id, map<string, int> terminals,
+        vector<vector<int>> parse_table, map<int, set<int>> follow,
+        map<int, set<int>> first, vector<vector<string>> rhs);
+
 // Simple boolean to determine printing
 const bool PRINT_DEBUG = false;
 const bool PRINT_FiFoTable = true;
@@ -55,7 +62,7 @@ int main() {
     cout << "                         CSC 435: Programming Languages" << endl;
     cout << "================================================================================" << endl;
     cout << "Note: It is recommended to use file redirection when running this." << endl;
-    cout << "Ex: g++ -std=c++11 main.cpp -o a.exe && cat input.txt | .\\a.exe" << endl;
+    cout << "Ex: g++ -std=c++11 main.cpp -o a.exe && .\\a.exe < input.txt" << endl;
 
     cout << endl << "Attempting to parse input from stdin..." << endl;
 
@@ -183,65 +190,12 @@ int main() {
     // 2D array to store the parse table in
     int x_size = non_terminals.size();
     int y_size = max_token_id;
-    int parse_table[x_size][y_size];
+    vector<vector<int>> parse_table(x_size, vector<int>(y_size));
 
     // Alg based on http://web.cs.wpi.edu/~kal/PLT/PLT4.3.html
-    for (int x = 0; x < x_size; x++) {
-        for (int y = 0; y < y_size; y++) {
-            parse_table[x][y] = 0;
-        }
-    }
-
-    int alpha_n = 1, temp;
-    for (auto p : productions) {
-        int A = p.first - 1;
-        for (auto v : p.second) {
-            bool one = true;
-            if (v.empty()) {
-                for (auto b : follow_sets[A]) {
-                    if (b != 0) {
-                        parse_table[A][b - 1] = alpha_n;
-                    }
-                }
-            }
-            for (auto alpha : v) {
-                if (one) {
-                    one = false;
-                    if (alpha < 0) {
-                        temp = -1 * alpha;
-                        parse_table[A][temp - 1] = alpha_n;
-                    }
-                    if (first_sets.find(alpha) != first_sets.end()) {
-                        for (auto b : first_sets[alpha]) {
-                            if (b != 0)
-                                parse_table[A][b - 1] = alpha_n;
-                        }
-                    }
-                    if (first_sets[alpha].find(EPSILON) != first_sets[alpha].end()) {
-                        for (auto b : follow_sets[A]) {
-                            if (b != 0) {
-                                parse_table[A][b - 1] = alpha_n;
-                            }
-                        }
-                    }
-                }
-            }
-            alpha_n++;
-        }
-    }
-
-    // Remove any first_set or follow_set entries that are not within bounds
-    // This is caused by the parse table algorithm searching for sets that may not exist
-    for (auto p : first_sets) {
-        if (p.first > productions.size() || p.first < 1) {
-            first_sets.erase(p.first);
-        }
-    }
-    for (auto p : follow_sets) {
-        if (p.first > productions.size() || p.first < 1) {
-            follow_sets.erase(p.first);
-        }
-    }
+    cout << "getting parse table" << endl;
+    get_parse_table(x_size, y_size, parse_table, productions, follow_sets, first_sets);
+    cout << "done parse table" << endl;
 
     cout << "Success!" << endl << endl;
 
@@ -272,98 +226,7 @@ int main() {
     cout << "Success!" << endl;
 
     cout << endl << "Attempting to use the parse_table to drive via a parse stack..." << endl;
-
-    // Using the algorithm from p 83 of book...
-    stack<string> parse_stack;
-    queue<scanner::token> parse_queue;
-    set<string> possible_tokens;
-
-    for (int i = 0; i < 40; i++) {
-        possible_tokens.insert(string(scanner::token_names[i]));
-    }
-
-    parse_stack.push("program");
-    cout << "initial stack contents" << endl;
-
-    // Consume everything from stdin
-    scanner::token t;
-    do {
-        t = scanner::scan();
-        parse_queue.push(t);
-    } while (t.num != scanner::tok_eof);
-
-    bool goes_to_ep = false;
-
-    while (!parse_stack.empty()) {
-        string top = parse_stack.top();
-        parse_stack.pop();
-
-        if (parse_queue.empty()) {
-            if (top == "tok_eof") {
-                cout << "Success, exiting!" << endl;
-                return 0;
-            }
-            goes_to_ep = false;
-            for (auto p : productions[non_terminal_id[top]]) {
-                if (p.empty()) {
-                    goes_to_ep = true;
-                }
-            }
-            if (goes_to_ep) {
-                cout << "predict " << top << " -> ep" << endl;
-            } else {
-                cerr << "Err: Unexpected token... Attempting to continue... (1)" << endl;
-            }
-        } else if (terminals.count(top) > 0) {
-            if (parse_queue.front().name == top) {
-                cout << "match " << parse_queue.front().name << endl;
-                parse_queue.pop();
-            } else {
-                cerr << "Err: Unexpected token... Attempting to continue... (2)" << endl;
-            }
-        } else {
-            int prediction = parse_table[non_terminal_id[top] - 1][terminals[parse_queue.front().name] - 1];
-            if (prediction == 0) {
-                // Cases 1, 2, 3 from syntax error recovery on spec
-                if (parse_queue.front().name == "tok_error" ||
-                    possible_tokens.find(parse_queue.front().name) == possible_tokens.end()) {
-                    cerr << "Err: Error Recovery Case 1" << endl;
-                    parse_queue.pop();
-                    continue;
-                } else if (terminals.count(parse_stack.top()) > 0 && parse_queue.front().name != parse_stack.top()) {
-                    cout << "Err: Error Recovery Case 2..." << endl;
-                    parse_stack.pop();
-                } else if (terminals.find(top) == terminals.end()) {
-                    cerr << "Err: Error Recovery Case 3...";
-                    while (true) {
-                        int t = parse_queue.front().num;
-                        parse_queue.pop();
-                        if (follow_sets[non_terminal_id[top]].find(t) != follow_sets[non_terminal_id[top]].end()) {
-                            parse_stack.pop();
-                            break;
-                        } else if (first_sets[non_terminal_id[top]].find(t) != first_sets[non_terminal_id[top]].end()) {
-                            break;
-                        }
-                    }
-                } else {
-                    cout << "Err: Unexpected token... Attempting to continue... (4)" << endl;
-                    cout << "PREDICTION 0: top: " << top << " x:" << non_terminal_id[top] - 1 << " y:"
-                         << terminals[parse_queue.front().name] - 1 << endl;
-                    continue;
-                }
-            } else {
-                cout << "predict " << top << " -> ";
-                vector<string> prod = rhs[prediction - 1];
-                for (int i = prod.size() - 1; i >= 0; i--) {
-                    parse_stack.push(prod[i]);
-                    cout << prod[i] << " ";
-                }
-                cout << endl;
-            }
-
-        }
-    }
-
+    run(productions, non_terminal_id, terminals, parse_table, follow_sets, first_sets, rhs);
     cout << "Done!" << endl;
 
     return 0;
@@ -521,6 +384,173 @@ void get_follow_set(map<int, vector<vector<int>>> &prod, map<int, set<int>> &fol
                 for (auto follow_i : follow[p.first])
                     follow[last].insert(follow_i);
             }
+        }
+    }
+}
+
+/**
+ * Helper function to generate the parse table.
+ * @param x_size      : The x width of the table
+ * @param y_size      : The y height of the table
+ * @param parse_table : The parse table array
+ * @param prod        : The productions
+ * @param follow      : The follow sets
+ * @param first       : The first sets
+ */
+void get_parse_table(int x_size, int y_size, vector<vector<int>> &parse_table, map<int, vector<vector<int>>> prod,
+                     map<int, set<int>> follow, map<int, set<int>> first) {
+    // Clear table
+    for (int x = 0; x < x_size; x++) {
+        for (int y = 0; y < y_size; y++) {
+            parse_table[x][y] = 0;
+        }
+    }
+
+    // Generate parse table from productions, follow sets, and first sets
+    int alpha_n = 1, temp;
+    for (auto p : prod) {
+        int A = p.first - 1;
+        for (auto v : p.second) {
+            bool one = true;
+            if (v.empty()) {
+                for (auto b : follow[A]) {
+                    if (b != 0) {
+                        parse_table[A][b - 1] = alpha_n;
+                    }
+                }
+            }
+            for (auto alpha : v) {
+                if (one) {
+                    one = false;
+                    if (alpha < 0) {
+                        temp = -1 * alpha;
+                        parse_table[A][temp - 1] = alpha_n;
+                    }
+                    if (first.find(alpha) != first.end()) {
+                        for (auto b : first[alpha]) {
+                            if (b != 0)
+                                parse_table[A][b - 1] = alpha_n;
+                        }
+                    }
+                    if (first[alpha].find(EPSILON) != first[alpha].end()) {
+                        for (auto b : follow[A]) {
+                            if (b != 0) {
+                                parse_table[A][b - 1] = alpha_n;
+                            }
+                        }
+                    }
+                }
+            }
+            alpha_n++;
+        }
+    }
+}
+
+/**
+ * Helper function to run the main loop as described in the textbook on page 83.
+ * @param x_size          : The x width of the table
+ * @param y_size          : The y height of the table
+ * @param prod            : Map of the productions
+ * @param non_terminal_id : Map of terminals id to string, to print friendly names
+ * @param terminals       : Map to the terminals
+ * @param parse_table     : The parse table
+ * @param follow          : The follow sets
+ * @param first           : The first sets
+ * @param rhs             : The right hand side of the productions
+ * @return                : Returns when done
+ */
+int run(map<int, vector<vector<int>>> prod, map<string, int> non_terminal_id, map<string, int> terminals,
+        vector<vector<int>> parse_table, map<int, set<int>> follow,
+        map<int, set<int>> first, vector<vector<string>> rhs) {
+    // Using the algorithm from p 83 of book...
+    stack<string> parse_stack;
+    queue<scanner::token> parse_queue;
+    set<string> possible_tokens;
+
+    for (int i = 0; i < 40; i++) {
+        possible_tokens.insert(string(scanner::token_names[i]));
+    }
+
+    parse_stack.push("program");
+    cout << "initial stack contents" << endl;
+
+    // Consume everything from stdin
+    scanner::token t;
+    do {
+        t = scanner::scan();
+        parse_queue.push(t);
+    } while (t.num != scanner::tok_eof);
+
+    bool goes_to_ep = false;
+
+    while (!parse_stack.empty()) {
+        string top = parse_stack.top();
+        parse_stack.pop();
+
+        if (parse_queue.empty()) {
+            if (top == "tok_eof") {
+                cout << "Success, exiting!" << endl;
+                return 0;
+            }
+            goes_to_ep = false;
+            for (auto p : prod[non_terminal_id[top]]) {
+                if (p.empty()) {
+                    goes_to_ep = true;
+                }
+            }
+            if (goes_to_ep) {
+                cout << "predict " << top << " -> ep" << endl;
+            } else {
+                cerr << "Err: Unexpected token... Attempting to continue... (1)" << endl;
+            }
+        } else if (terminals.count(top) > 0) {
+            if (parse_queue.front().name == top) {
+                cout << "match " << parse_queue.front().name << endl;
+                parse_queue.pop();
+            } else {
+                cerr << "Err: Unexpected token... Attempting to continue... (2)" << endl;
+            }
+        } else {
+            int prediction = parse_table[non_terminal_id[top] - 1][terminals[parse_queue.front().name] - 1];
+            if (prediction == 0) {
+                // Cases 1, 2, 3 from syntax error recovery on spec
+                if (parse_queue.front().name == "tok_error" ||
+                    possible_tokens.find(parse_queue.front().name) == possible_tokens.end()) {
+                    cerr << "Err: Error Recovery Case 1" << endl;
+                    parse_queue.pop();
+                    continue;
+                } else if (terminals.count(parse_stack.top()) > 0 && parse_queue.front().name != parse_stack.top()) {
+                    cout << "Err: Error Recovery Case 2..." << endl;
+                    parse_stack.pop();
+                    continue;
+                } else if (terminals.find(top) == terminals.end()) {
+                    cerr << "Err: Error Recovery Case 3...";
+                    while (true) {
+                        int t = parse_queue.front().num;
+                        parse_queue.pop();
+                        if (follow[non_terminal_id[top]].find(t) != follow[non_terminal_id[top]].end()) {
+                            parse_stack.pop();
+                            break;
+                        } else if (first[non_terminal_id[top]].find(t) != first[non_terminal_id[top]].end()) {
+                            break;
+                        }
+                    }
+                } else {
+                    cout << "Err: Unexpected token... Attempting to continue... (4)" << endl;
+                    cout << "PREDICTION 0: top: " << top << " x:" << non_terminal_id[top] - 1 << " y:"
+                         << terminals[parse_queue.front().name] - 1 << endl;
+                    continue;
+                }
+            } else {
+                cout << "predict " << top << " -> ";
+                vector<string> prod = rhs[prediction - 1];
+                for (int i = prod.size() - 1; i >= 0; i--) {
+                    parse_stack.push(prod[i]);
+                    cout << prod[i] << " ";
+                }
+                cout << endl;
+            }
+
         }
     }
 }
