@@ -1,6 +1,7 @@
 /*
  * Kevin Bohinski & Evan Melquist
  * 10/9/16
+ * Updated 10/20/16
  * CSC 435 Programming Languages
  *
  * Project 2: Part 1
@@ -17,6 +18,7 @@
 #include <stack>
 #include <queue>
 
+#include <stdio.h>
 #include "./scanner/scan.cc"
 
 using namespace std;
