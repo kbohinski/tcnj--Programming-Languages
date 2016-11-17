@@ -18,7 +18,12 @@ cross([H, F, 0], [H2, F2, 1]) :-
   F > 0.
 
 cross([H, F, 0], [H2, F2, 1]) :-
+  F2 =:= (F - 1),
+  F > 0.
+
 cross([H, F, 0], [H2, F2, 1]) :-
+  F2 =:= (F - 2),
+  F > 1.
 
 % right to left crossings
 cross([H, F, 1], [H2, F2, 0]) :-
