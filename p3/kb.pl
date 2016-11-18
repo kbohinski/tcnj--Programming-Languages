@@ -1,71 +1,85 @@
+% riddle start and end states
+start_state(state(3, 3, 0)).
+end_state(state(0, 0, 1)).
+
+% overarching function to solve riddle
 solve :-
+  nl,
   write('starting?'),
+  bfs([[3, 3, 0]], past_crossings),
   cross_river([3, 3, 0], [0, 0, 1], [[3, 3, 0]]).
 
-cross_river([H, F, LR], [H, F, LR]) :-
-  write('base case?').
+% base case for bfs... 
+bfs([Node | _], Node) :-
+  end_state(Node).
 
-cross_river([H, F, LR], [H1, F1, LR1], past_crossings) :-
-  cross([H, F, LR], [A, B, C]),
-  safe(A, B),
-  not(member([A, B, C], past_crossings)),
-  cross_river([A, B, C], [H1, F1, LR1], [[A, B, C] | past_crossings]).
+% recursive part of bfs...
+bfs([])
 
 % unsafe(NumHens, NumFoxes) determines if it is a safe move...
-safe(H, F) :- F =< H; H =:= 0.
+safe(F, H) :- 
+  F =< H; H =:= 0.
+
+% all possible river crossings, one hen states are removed as they will not occur
 
 % left to right crossings
-cross([H, F, 0], [H2, F2, 1]) :-
-  write('One hen crosses L -> R'),
-  H2 is (H - 1),
-  H > 0.
-
-cross([H, F, 0], [H2, F2, 1]) :-
+cross(state(H1, F1, 0), state(H2, F2, 1)) :-
+  nl,
   write('Two hens cross L -> R'),
-  H2 is (H - 2),
-  H > 1.
+  H2 is (H1 - 2),
+  H1 > 1,
+  safe(H2, F1).
 
-cross([H, F, 0], [H2, F2, 1]) :-
+cross(state(H1, F1, 0), state(H2, F2, 1)) :-
+  nl,
   write('One hen and one fox cross L -> R'),
-  H2 is (H - 1),
-  F2 is (F - 1),
-  H > 0,
-  F > 0.
+  H2 is (H1 - 1),
+  F2 is (F1 - 1),
+  H1 > 0,
+  F1 > 0,
+  safe(H2, F2).
 
-cross([H, F, 0], [H2, F2, 1]) :-
+cross(state(H1, F1, 0), state(H2, F2, 1)) :-
+  nl,
   write('One fox crosses L -> R'),
-  F2 is (F - 1),
-  F > 0.
+  F2 is (F1 - 1),
+  F1 > 0,
+  safe(H1, F2).
 
-cross([H, F, 0], [H2, F2, 1]) :-
+cross(state(H1, F1, 0), state(H2, F2, 1)) :-
+  nl,
   write('Two foxes cross L -> R'),
-  F2 is (F - 2),
-  F > 1.
+  F2 is (F1 - 2),
+  F1 > 1,
+  safe(H1, F2).
 
 % right to left crossings
-cross([H, F, 1], [H2, F2, 0]) :-
-  write('One hen crosses L <- R'),
-  H2 is (H + 1),
-  H < 3.
-
-cross([H, F, 1], [H2, F2, 0]) :-
+cross(state(H1, F1, 1), state(H2, F2, 0)) :-
+  nl,
   write('Two hens cross L <- R'),
-  H2 is (H + 2),
-  H < 2.
+  H2 is (H1 + 2),
+  H1 < 2,
+  safe(H2, F1).
 
-cross([H, F, 1], [H2, F2, 0]) :-
+cross(state(H1, F1, 1), state(H2, F2, 0)) :-
+  nl,
   write('One hen and one fox crosses L <- R'),
-  F2 is F + 1,
-  H2 is H + 1,
-  F < 3,
-  H < 3.
+  F2 is F1 + 1,
+  H2 is H1 + 1,
+  F1 < 3,
+  H1 < 3,
+  safe(H2, F2).
 
-cross([H, F, 1], [H2, F2, 0]) :-
+cross(state(H1, F1, 1), state(H2, F2, 0)) :-
+  nl,
   write('One fox crosses L <- R'),
-  F2 is (F + 1),
-  F < 3.
+  F2 is (F1 + 1),
+  F1 < 3,
+  safe(H1, F2).
 
-cross([H, F, 1], [H2, F2, 0]) :-
+cross(state(H1, F1, 1), state(H2, F2, 0)) :-
+  nl,
   write('Two foxes cross L <- R'),
-  F2 is (F + 2),
-  F < 2.
+  F2 is (F1 + 2),
+  F1 < 2,
+  safe(H1, F2).
