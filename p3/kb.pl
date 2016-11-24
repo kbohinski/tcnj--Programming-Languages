@@ -21,29 +21,29 @@ solve(S, Crossings, Last, Output) :-
   (cross(S, N, Last, K, Out), not(member(N, Crossings)), solve(N, [N | Crossings], K, [Out | Output])).
 
 % DOES NOT WORK -- Was a BFS to determine number of possible solutions per spec.
-solve_bfs :-
-  start_state(X),
-  bfs([[X]], Problem),
-  printl(Problem).
-
-% Base case for bfs... 
-bfs([Node | _], Node) :-
-  done(Node).
-
-% Recursive part of bfs...
-bfs(Crossings, [Node | Tree]) :-
-  progress_tree(Node, A),
-  append(Tree, A, B),
-  bfs(B, Crossings).
- 
-progress_tree([Node | Tree], NewProgress) :-
-  % ! - Ensures it is done in reverse...
-  setof([New, Node | Tree], (cross(Node, New, _, _, _), (member(New, [Node | Tree]), !)), NewProgress), !.
-
- progress_tree(_, []).
+% solve_bfs :-
+%   start_state(X),
+%   bfs([[X]], Problem),
+%   printl(Problem).
 % 
- done([State | _]) :-
-   end_state(State).
+% Base case for bfs... 
+% bfs([Node | _], Node) :-
+%   done(Node).
+% 
+% Recursive part of bfs...
+% bfs(Crossings, [Node | Tree]) :-
+%   progress_tree(Node, A),
+%   append(Tree, A, B),
+%   bfs(B, Crossings).
+% 
+% progress_tree([Node | Tree], NewProgress) :-
+%   % ! - Ensures it is done in reverse...
+%   setof([New, Node | Tree], (cross(Node, New, _, _, _), (member(New, [Node | Tree]), !)), NewProgress), !.
+% 
+% progress_tree(_, []).
+% 
+% done([State | _]) :-
+%   end_state(State).
 
 % Riddle start and end states
 start_state([3, 3, 1, 0, 0]).
