@@ -146,5 +146,4 @@ cross([HL, FL, 0, HR, FR], [HL, FLN, 1, HR, FRN], Last, Move) :-
 
 % Safe function to make sure hens dont get eaten.
 safe([HL, FL, _, HR, FR]) :- 
-  HL >= FL,
-  HR >= FR.
+  ((HL >= FL; HL =:= 0), (HR >= FR; HR =:= 0)).
