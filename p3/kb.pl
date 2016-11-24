@@ -13,7 +13,7 @@
 % Overarching functions to solve riddle
 solve :-
   start_state(X),
-  write(['Start state                      ', 3, 3, 1, 0, 0]),
+  printl(['Start state                      ', 3, 3, 1, 0, 0]),
   solve(X, [X], -1, []).
 
 solve(S, Crossings, Last, Output) :-
