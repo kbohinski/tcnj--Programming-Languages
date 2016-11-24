@@ -47,7 +47,7 @@ solve(S, Crossings, Last) :-
 
 % Riddle start and end states
 start_state([3, 3, 1, 0, 0]).
-end_state([0, 0, 0, 0, 0]).
+end_state([0, 0, 0, 3, 3]).
 
 % Helper functions
 printl(String) :- write(String), nl.
