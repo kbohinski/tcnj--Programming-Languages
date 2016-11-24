@@ -61,7 +61,8 @@ reverse_list([H | T], Z, Acc) :- reverse_list(T, Z, [H | Acc]).
 print_list([]).
 print_list([X | Y]) :- nl, write(X), print_list(Y).
 
-% All possible river crossings rules, one hen crosses are removed as they will not occur...
+
+% All possible river crossings rules...
 
 % Left to right crossings
 cross([HL, FL, 1, HR, FR], [HLN, FL, 0, HRN, FR], Last, Move, Out) :-
