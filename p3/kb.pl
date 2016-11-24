@@ -10,14 +10,17 @@
 % Module to ensure math is integer...
 % :- use_module(library(clpfd)).
 
+% Using global vars for storing possible solutions...
+
 % Overarching functions to solve riddle
 solve :-
   start_state(X),
+  nb_setval(solutions, []),
   printl(['Start state                      ', 3, 3, 1, 0, 0]),
   solve(X, [X], -1, []).
 
 solve(S, Crossings, Last, Output) :-
-  (end_state(S), reverse_list(Output, Rev, []), print_list(Rev));
+  (end_state(S), nb_getval(solutions, Solutions), not(member(Output, Solutions)), reverse_list(Output, Rev, []), print_list(Rev), nb_setval(solutions, [Output | Solutions]));
   (cross(S, N, Last, K, Out), not(member(N, Crossings)), solve(N, [N | Crossings], K, [Out | Output])).
 
 % DOES NOT WORK -- Was a BFS to determine number of possible solutions per spec.
@@ -57,7 +60,6 @@ reverse_list([], Z, Z).
 reverse_list([H | T], Z, Acc) :- reverse_list(T, Z, [H | Acc]).
 print_list([]).
 print_list([X | Y]) :- nl, write(X), print_list(Y).
-
 
 % All possible river crossings rules, one hen crosses are removed as they will not occur...
 
