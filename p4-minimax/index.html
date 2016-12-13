@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <!-- HTML meta key, value, pairs -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- HTML meta author, description, and title -->
+    <meta name="author" content="https://keybase.io/kbohinski">
+    <meta name="description" content="Konane">
+    <title>Konane</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+
+    <!-- CSS Reset -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+
+    <!-- Milligram CSS minified -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.2.2/milligram.min.css">
+
+    <style>
+        .button-large {
+            font-size: 1.4rem;
+            height: 4.5rem;
+            line-height: 4.5rem;
+            padding: 0 2rem;
+        }
+
+        .valid-move {
+            border-style: solid;
+            border-width: 5px;
+            border-color: #00d400;
+        }
+
+        .minimax-move {
+            border-style: solid;
+            border-width: 5px;
+            border-color: #ffcece;
+        }
+
+        .empty {
+            background-color: rgb(200, 200, 200);
+        }
+
+        .dark {
+            background-color: rgb(85, 50, 110);
+        }
+
+        .light {
+            background-color: rgb(155, 77, 202);
+        }
+    </style>
+
+    <!-- JS -->
+    <!-- CDN in the PubNub JS SDK -->
+    <script src="http://cdn.pubnub.com/pubnub-3.14.3.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <h1 style="margin-top: .25em;">
+        <img
+                src="https://raw.githubusercontent.com/monifu/scala-best-practices/master/assets/scala-logo-256.png"
+                width="80" height="80"/> Scala Konane!
+    </h1>
+    <h4 id="status">Waiting for Scala...</h4>
+
+    <a id="start" class="button button-large">Start game...</a>
+    <div class="row">
+        <div class="column column-15"></div>
+        <div class="column column-70">
+            <table id="board" style="visibility: hidden;">
+                <tr>
+                    <td style="text-align: center;"></td>
+                    <td style="text-align: center;">1</td>
+                    <td style="text-align: center;">2</td>
+                    <td style="text-align: center;">3</td>
+                    <td style="text-align: center;">4</td>
+                    <td style="text-align: center;">5</td>
+                    <td style="text-align: center;">6</td>
+                    <td style="text-align: center;">7</td>
+                    <td style="text-align: center;">8
+                </tr>
+                <tr>
+                    <td style="text-align: center;">8</td>
+                    <td id="8-1" class="token"></td>
+                    <td id="8-2" class="token"></td>
+                    <td id="8-3" class="token"></td>
+                    <td id="8-4" class="token"></td>
+                    <td id="8-5" class="token"></td>
+                    <td id="8-6" class="token"></td>
+                    <td id="8-7" class="token"></td>
+                    <td id="8-8" class="token"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">7</td>
+                    <td id="7-1" class="token"></td>
+                    <td id="7-2" class="token"></td>
+                    <td id="7-3" class="token"></td>
+                    <td id="7-4" class="token"></td>
+                    <td id="7-5" class="token"></td>
+                    <td id="7-6" class="token"></td>
+                    <td id="7-7" class="token"></td>
+                    <td id="7-8" class="token"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">6</td>
+                    <td id="6-1" class="token"></td>
+                    <td id="6-2" class="token"></td>
+                    <td id="6-3" class="token"></td>
+                    <td id="6-4" class="token"></td>
+                    <td id="6-5" class="token"></td>
+                    <td id="6-6" class="token"></td>
+                    <td id="6-7" class="token"></td>
+                    <td id="6-8" class="token"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">5</td>
+                    <td id="5-1" class="token"></td>
+                    <td id="5-2" class="token"></td>
+                    <td id="5-3" class="token"></td>
+                    <td id="5-4" class="token"></td>
+                    <td id="5-5" class="token"></td>
+                    <td id="5-6" class="token"></td>
+                    <td id="5-7" class="token"></td>
+                    <td id="5-8" class="token"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">4</td>
+                    <td id="4-1" class="token"></td>
+                    <td id="4-2" class="token"></td>
+                    <td id="4-3" class="token"></td>
+                    <td id="4-4" class="token"></td>
+                    <td id="4-5" class="token"></td>
+                    <td id="4-6" class="token"></td>
+                    <td id="4-7" class="token"></td>
+                    <td id="4-8" class="token"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">3</td>
+                    <td id="3-1" class="token"></td>
+                    <td id="3-2" class="token"></td>
+                    <td id="3-3" class="token"></td>
+                    <td id="3-4" class="token"></td>
+                    <td id="3-5" class="token"></td>
+                    <td id="3-6" class="token"></td>
+                    <td id="3-7" class="token"></td>
+                    <td id="3-8" class="token"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">2</td>
+                    <td id="2-1" class="token"></td>
+                    <td id="2-2" class="token"></td>
+                    <td id="2-3" class="token"></td>
+                    <td id="2-4" class="token"></td>
+                    <td id="2-5" class="token"></td>
+                    <td id="2-6" class="token"></td>
+                    <td id="2-7" class="token"></td>
+                    <td id="2-8" class="token"></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1</td>
+                    <td id="1-1" class="token"></td>
+                    <td id="1-2" class="token"></td>
+                    <td id="1-3" class="token"></td>
+                    <td id="1-4" class="token"></td>
+                    <td id="1-5" class="token"></td>
+                    <td id="1-6" class="token"></td>
+                    <td id="1-7" class="token"></td>
+                    <td id="1-8" class="token"></td>
+                </tr>
+            </table>
+        </div>
+        <div class="column column-15"></div>
+    </div>
+    <div id="log"></div>
+</div>
+</body>
+<script type="text/javascript">
+    'use strict';
+
+    (function () {
+        /* Shortcut el('x') to document.getElementById('x') */
+        let el = document.getElementById.bind(document)
+
+        let ROOM_ID = Math.floor(Math.random() * 9000) + 1000
+        el('status').innerHTML += '<br>Room ID: ' + ROOM_ID
+
+        Array.prototype.contains = function (element) {
+            return this.indexOf(element) > -1
+        }
+
+        let turn = false
+        let remove = true
+        let possibleMoves = []
+        let last = { 'x': -1, 'y': -1 }
+        let minimaxLast = {}
+        let X_TILE = ''
+        let O_TILE = ''
+
+        function setEmptyTile (x, y) {
+            el(x + '-' + y).innerHTML = '<a id="' + x + '-' + y + '-btn" class="empty cell button" href="#">-</a>'
+        }
+
+        function setDarkTile (x, y) {
+            el(x + '-' + y).innerHTML = '<a id="' + x + '-' + y + '-btn" class="dark cell button" href="#">X</a>'
+        }
+
+        function setLightTile (x, y) {
+            el(x + '-' + y).innerHTML = '<a id="' + x + '-' + y + '-btn" class="light cell button" href="#">O</a>'
+        }
+
+        /* Set PubNub Keys */
+        let PUBNUB_PUB_KEY = 'pub-c-af9d3333-b289-4e2f-aeaa-e0373d09a97e'
+        let PUBNUB_SUB_KEY = 'sub-c-9140b13e-b802-11e6-b07a-0619f8945a4f'
+
+        /* Instantiate a new instance of PubNub */
+        let pub_nub = PUBNUB.init({
+            publish_key: PUBNUB_PUB_KEY,
+            subscribe_key: PUBNUB_SUB_KEY,
+            error: function (error) {
+                console.log('Error:', error)
+            }
+        })
+
+        /* Subscribe to the channel */
+        pub_nub.subscribe({
+            channel: 'konane-web' + ROOM_ID,
+            message: function (m) {
+                el('log').innerHTML = '<pre><code>' + JSON.stringify(m) + '</code></pre>' + el('log').innerHTML
+                if (m.from === 'scala') {
+                    if (m.type === 'remove') {
+                        setEmptyTile(m.x, m.y)
+                        el(m.x + '-' + m.y + '-btn').classList.add('minimax-move')
+                        minimaxLast = { 'x': m.x, 'y': m.y }
+                        el('status').innerHTML = 'Minimax has removed ' + m.x + ', ' + m.y + '<br>'
+                    } else if (m.type === 'move') {
+                        setEmptyTile(m.x1, m.y1)
+                        let x1 = m.x1
+                        let x2 = m.x2
+                        let y1 = m.y1
+                        let y2 = m.y2
+                        let dx = Math.abs(x2 - x1)
+                        let dy = Math.abs(y2 - y1)
+                        if (dx === 0) {
+                            if (y2 > y1) {
+                                for (let i = y1; i <= y2; i++) {
+                                    setEmptyTile(x1, i)
+                                }
+                            } else {
+                                for (let i = y2; i <= y1; i++) {
+                                    setEmptyTile(x1, i)
+                                }
+                            }
+                        }
+                        if (dy === 0) {
+                            if (x2 > x1) {
+                                for (let i = x1; i <= x2; i++) {
+                                    setEmptyTile(i, y1)
+                                }
+                            } else {
+                                for (let i = x2; i <= x1; i++) {
+                                    setEmptyTile(i, y1)
+                                }
+                            }
+                        }
+                        setEmptyTile(((parseInt(m.x1) + parseInt(m.x2)) / 2), ((parseInt(m.y1) + parseInt(m.y2)) / 2))
+                        setDarkTile(m.x2, m.y2)
+                        el(m.x1 + '-' + m.y1 + '-btn').classList.add('minimax-move')
+                        el(m.x2 + '-' + m.y2 + '-btn').classList.add('minimax-move')
+                        minimaxLast = { 'x1': m.x1, 'y1': m.y1, 'x2': m.x2, 'y2': m.y2 }
+                        el('status').innerHTML = 'Minimax has moved ' + m.x1 + ', ' + m.y1 + ' to ' + m.x2 + ', ' + m.y2 + '<br>'
+                    } else if (m.type === 'options') {
+                        if (m[ '0' ] === undefined) {
+                            pub_nub.publish({
+                                channel: 'konane-web' + ROOM_ID,
+                                message: {
+                                    'from': 'browser',
+                                    'type': 'remove',
+                                    'id': 0
+                                }
+                            })
+                        }
+                        let i = 0
+                        el('status').innerHTML += '<br>Here are your options:<br>'
+                        if (remove) {
+                            while (m[ i ] !== undefined) {
+                                el('status').innerHTML += i + ') ' + m[ i ] + '<br>'
+                                let tokens = m[ i ].split('<')[ 1 ].split('>')[ 0 ]
+                                tokens = tokens.replace(' ', '-')
+                                possibleMoves.push(tokens)
+                                el(tokens + '-btn').classList.add('valid-move')
+                                i += 1
+                            }
+                        } else {
+                            while (m[ i ] !== undefined) {
+                                el('status').innerHTML += i + ') ' + m[ i ] + '<br>'
+                                let tokens1 = m[ i ].split('<')[ 1 ].split('>')[ 0 ]
+                                tokens1 = tokens1.replace(' ', '-')
+                                let tokens2 = m[ i ].split('<')[ 2 ].split('>')[ 0 ]
+                                tokens2 = tokens2.replace(' ', '-')
+                                possibleMoves.push([ tokens1, tokens2 ])
+                                el(tokens1 + '-btn').classList.add('valid-move')
+                                i += 1
+                            }
+                        }
+                        turn = true
+                    } else if (m.type === 'win') {
+                        el('status').innerHTML = m.winner + ' has won!'
+                        pub_nub = ''
+                        turn = false
+                    }
+                }
+            },
+            error: function (error) {
+                console.log('Error: ' + JSON.stringify(error))
+            }
+        })
+
+        let buttons = document.querySelectorAll('.token')
+
+        el('start').addEventListener('click', function buttonClicked (e) {
+            /* Prevent link from being navigated to */
+            e.preventDefault()
+
+            el('start').outerHTML = ''
+            el('board').style.visibility = 'visible'
+
+            for (let i = 0; i < buttons.length; i++) {
+                let x = buttons[ i ].id.split('-')[ 0 ]
+                let y = buttons[ i ].id.split('-')[ 1 ]
+                if (((x - 1) + (y - 1)) % 2 === 1) {
+                    setDarkTile(x, y)
+                } else {
+                    setLightTile(x, y)
+                }
+                buttons[ i ].addEventListener('click', function buttonClicked (e) {
+                    /* Prevent link from being navigated to */
+                    e.preventDefault()
+
+                    if (turn) {
+                        /* Determine which button was actually clicked */
+                        let ele = e.target
+                        let x = ele.id.split('-')[ 0 ]
+                        let y = ele.id.split('-')[ 1 ]
+                        let id = x + '-' + y
+
+                        let check = false
+                        if (possibleMoves[ 0 ].length === 2) {
+                            for (let i = 0; i < possibleMoves.length; i++) {
+                                if (possibleMoves[ i ].contains(id)) {
+                                    check = true
+                                    break
+                                }
+                            }
+                        }
+                        if (possibleMoves.contains(id) || check) {
+                            if (remove) {
+                                let moveId = ''
+                                for (let i = 0; i < possibleMoves.length; i++) {
+                                    if (possibleMoves[ i ] === id) {
+                                        moveId = i
+                                    }
+                                    el(possibleMoves[ i ] + '-btn').classList.remove('valid-move')
+                                }
+                                el(minimaxLast.x + '-' + minimaxLast.y + '-btn').classList.remove('minimax-move')
+
+                                setEmptyTile(x, y)
+
+                                pub_nub.publish({
+                                    channel: 'konane-web' + ROOM_ID,
+                                    message: {
+                                        'from': 'browser',
+                                        'type': 'remove',
+                                        'id': moveId
+                                    }
+                                })
+
+                                possibleMoves = []
+                                turn = false
+                                remove = false
+                            } else {
+                                if (last.x !== -1) {
+                                    let moveId = -1
+                                    for (let i = 0; i < possibleMoves.length; i++) {
+                                        if (possibleMoves[ i ][ 0 ] === (last.x + '-' + last.y)) {
+                                            el(possibleMoves[ i ][ 1 ] + '-btn').classList.remove('valid-move')
+                                        }
+                                        if (possibleMoves[ i ][ 0 ] === (last.x + '-' + last.y) && possibleMoves[ i ][ 1 ] === (x + '-' + y)) {
+                                            moveId = i
+                                        }
+                                    }
+                                    el(minimaxLast.x1 + '-' + minimaxLast.y1 + '-btn').classList.remove('minimax-move')
+                                    el(minimaxLast.x2 + '-' + minimaxLast.y2 + '-btn').classList.remove('minimax-move')
+
+                                    let x1 = last.x
+                                    let x2 = x
+                                    let y1 = last.y
+                                    let y2 = y
+                                    let dx = Math.abs(x2 - x1)
+                                    let dy = Math.abs(y2 - y1)
+                                    if (dx === 0) {
+                                        if (y2 > y1) {
+                                            for (let i = y1; i <= y2; i++) {
+                                                setEmptyTile(x1, i)
+                                            }
+                                        } else {
+                                            for (let i = y2; i <= y1; i++) {
+                                                setEmptyTile(x1, i)
+                                            }
+                                        }
+                                    }
+                                    if (dy === 0) {
+                                        if (x2 > x1) {
+                                            for (let i = x1; i <= x2; i++) {
+                                                setEmptyTile(i, y1)
+                                            }
+                                        } else {
+                                            for (let i = x2; i <= x1; i++) {
+                                                setEmptyTile(i, y1)
+                                            }
+                                        }
+                                    }
+
+                                    setEmptyTile(last.x, last.y)
+                                    setEmptyTile(((parseInt(last.x) + parseInt(x)) / 2), ((parseInt(last.y) + parseInt(y)) / 2))
+                                    setLightTile(x, y)
+
+                                    pub_nub.publish({
+                                        channel: 'konane-web' + ROOM_ID,
+                                        message: {
+                                            'from': 'browser',
+                                            'type': 'remove',
+                                            'id': moveId
+                                        }
+                                    })
+
+                                    last = { 'x': -1, 'y': -1 }
+                                    possibleMoves = []
+                                    turn = false
+                                } else {
+                                    last = { 'x': x, 'y': y }
+                                    let moveIds = []
+                                    for (let i = 0; i < possibleMoves.length; i++) {
+                                        if (possibleMoves[ i ][ 0 ] === (x + '-' + y)) {
+                                            moveIds.push(i)
+                                        }
+                                        el(possibleMoves[ i ][ 0 ] + '-btn').classList.remove('valid-move')
+                                    }
+                                    for (let i = 0; i < moveIds.length; i++) {
+                                        el(possibleMoves[ moveIds[ i ] ][ 1 ] + '-btn').classList.add('valid-move')
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }, false)
+            }
+
+            pub_nub.publish({
+                channel: 'konane-web' + ROOM_ID,
+                message: { 'from': 'browser', 'status': 'start' }
+            })
+        }, false)
+    })()
+</script>
+
+</html>
