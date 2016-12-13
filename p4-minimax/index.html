@@ -202,8 +202,6 @@
         let possibleMoves = []
         let last = { 'x': -1, 'y': -1 }
         let minimaxLast = {}
-        let X_TILE = ''
-        let O_TILE = ''
 
         function setEmptyTile (x, y) {
             el(x + '-' + y).innerHTML = '<a id="' + x + '-' + y + '-btn" class="empty cell button" href="#">-</a>'
@@ -215,6 +213,33 @@
 
         function setLightTile (x, y) {
             el(x + '-' + y).innerHTML = '<a id="' + x + '-' + y + '-btn" class="light cell button" href="#">O</a>'
+        }
+
+        function clearInBetween (x1, y1, x2, y2) {
+            let dx = Math.abs(x2 - x1)
+            let dy = Math.abs(y2 - y1)
+            if (dx === 0) {
+                if (y2 > y1) {
+                    for (let i = y1; i <= y2; i++) {
+                        setEmptyTile(x1, i)
+                    }
+                } else {
+                    for (let i = y2; i <= y1; i++) {
+                        setEmptyTile(x1, i)
+                    }
+                }
+            }
+            if (dy === 0) {
+                if (x2 > x1) {
+                    for (let i = x1; i <= x2; i++) {
+                        setEmptyTile(i, y1)
+                    }
+                } else {
+                    for (let i = x2; i <= x1; i++) {
+                        setEmptyTile(i, y1)
+                    }
+                }
+            }
         }
 
         /* Set PubNub Keys */
@@ -243,34 +268,7 @@
                         el('status').innerHTML = 'Minimax has removed ' + m.x + ', ' + m.y + '<br>'
                     } else if (m.type === 'move') {
                         setEmptyTile(m.x1, m.y1)
-                        let x1 = m.x1
-                        let x2 = m.x2
-                        let y1 = m.y1
-                        let y2 = m.y2
-                        let dx = Math.abs(x2 - x1)
-                        let dy = Math.abs(y2 - y1)
-                        if (dx === 0) {
-                            if (y2 > y1) {
-                                for (let i = y1; i <= y2; i++) {
-                                    setEmptyTile(x1, i)
-                                }
-                            } else {
-                                for (let i = y2; i <= y1; i++) {
-                                    setEmptyTile(x1, i)
-                                }
-                            }
-                        }
-                        if (dy === 0) {
-                            if (x2 > x1) {
-                                for (let i = x1; i <= x2; i++) {
-                                    setEmptyTile(i, y1)
-                                }
-                            } else {
-                                for (let i = x2; i <= x1; i++) {
-                                    setEmptyTile(i, y1)
-                                }
-                            }
-                        }
+                        clearInBetween(m.x1, m.y1, m.x2, m.y2)
                         setEmptyTile(((parseInt(m.x1) + parseInt(m.x2)) / 2), ((parseInt(m.y1) + parseInt(m.y2)) / 2))
                         setDarkTile(m.x2, m.y2)
                         el(m.x1 + '-' + m.y1 + '-btn').classList.add('minimax-move')
@@ -400,35 +398,7 @@
                                     el(minimaxLast.x1 + '-' + minimaxLast.y1 + '-btn').classList.remove('minimax-move')
                                     el(minimaxLast.x2 + '-' + minimaxLast.y2 + '-btn').classList.remove('minimax-move')
 
-                                    let x1 = last.x
-                                    let x2 = x
-                                    let y1 = last.y
-                                    let y2 = y
-                                    let dx = Math.abs(x2 - x1)
-                                    let dy = Math.abs(y2 - y1)
-                                    if (dx === 0) {
-                                        if (y2 > y1) {
-                                            for (let i = y1; i <= y2; i++) {
-                                                setEmptyTile(x1, i)
-                                            }
-                                        } else {
-                                            for (let i = y2; i <= y1; i++) {
-                                                setEmptyTile(x1, i)
-                                            }
-                                        }
-                                    }
-                                    if (dy === 0) {
-                                        if (x2 > x1) {
-                                            for (let i = x1; i <= x2; i++) {
-                                                setEmptyTile(i, y1)
-                                            }
-                                        } else {
-                                            for (let i = x2; i <= x1; i++) {
-                                                setEmptyTile(i, y1)
-                                            }
-                                        }
-                                    }
-
+                                    clearInBetween(last.x, last.y, x, y)
                                     setEmptyTile(last.x, last.y)
                                     setEmptyTile(((parseInt(last.x) + parseInt(x)) / 2), ((parseInt(last.y) + parseInt(y)) / 2))
                                     setLightTile(x, y)
