@@ -1,6 +1,7 @@
 package com.plteamscala.konane
 
 import java.awt.Desktop
+import java.io.File
 import java.net.URI
 import java.util.Arrays
 
@@ -140,7 +141,7 @@ object Driver {
       println("Ok! Let's play!\n")
     } else {
       if (Desktop.isDesktopSupported()) {
-        Desktop.getDesktop().browse(new URI("index.html"))
+        Desktop.getDesktop().browse(new File("index.html").toURI())
       }
 
       println("Please enter the room id from the website:")
